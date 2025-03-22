@@ -8,6 +8,8 @@ import org.springframework.stereotype.Repository;
 
 import com.kh.mini.dto.UsersDto;
 import com.kh.mini.mapper.UsersMapper;
+import com.kh.mini.vo.PageVo;
+import com.kh.mini.vo.PageVo.PageVO;
 
 @Repository
 public class UsersDao {
@@ -21,20 +23,20 @@ public class UsersDao {
 	
 	public void insert(UsersDto usersDto) {
 		String sql= "insert into users( "
-				+ "users_email, users_pw_users_contact, users_level, users_nickname)"
-				+ " value(? ,? ,? ,? ,? ,?)";
+				+ "users_email, users_pw,users_contact, users_nickname)"
+				+ " values(? ,? ,? ,?)";
 		Object[] data = {usersDto.getUsersEmail(), usersDto.getUsersPw(), usersDto.getUsersContact(),
-							usersDto.getUsersLevel(), usersDto.getUsersNickname()};
+							usersDto.getUsersNickname()};
 		
 		jdbcTemplate.update(sql,data);
 	}
 	
 	public boolean update(UsersDto usersDto) {
-		String sql = "update users set users_email=? , users_pw=?, users_contact=?, "
-				+ "users_level=?, users_nickname= ? ";
+		String sql = "update users set , users_contact=?, "
+				+ "users_nickname= ? where users_email=?";
 		
-		Object[] data = {usersDto.getUsersEmail(), usersDto.getUsersPw(), usersDto.getUsersContact(),
-				usersDto.getUsersLevel(), usersDto.getUsersNickname()};
+		Object[] data = {usersDto.getUsersContact(),
+				 usersDto.getUsersNickname(),usersDto.getUsersEmail()};
 		
 		return jdbcTemplate.update(sql,data) >0;
 	}
@@ -51,5 +53,41 @@ public class UsersDao {
 		Object[] data = {usersEmail};
 		List<UsersDto> list = jdbcTemplate.query(sql, usersMapper, data);
 		return list.isEmpty() ? null : list.get(0);
+	}
+	
+	public List<UsersDto> selectList(PageVO pageVO){
+		if(pageVO.isList()) {
+			String sql = "select * from( "
+					+ " select rownum rn, TMP.*from("
+					+ "select * from users order by users_email asc"
+					+ ")TMP" 
+					+ ")where rn, between ? and ?";
+			Object[] data  = {pageVO.getStartRownum(),pageVO.getFinishRownum()}; 
+			return jdbcTemplate.query(sql,usersMapper,data);
+		}
+		else {
+			String sql = "select * from("
+					+ " select rownum rn, TMP.*from("
+					+ "select * from users where instr(#1, ?) > 0"
+					+ "order by #1 asc, users_email asc "
+					+ ")TMP"
+					+ ")where rn, between ? and ?";
+			sql.replace("#1",pageVO.getColumn());
+			Object[] data = {pageVO.getKeyword(), pageVO.getStartRownum(), pageVO.getFinishRownum()};
+			return jdbcTemplate.query(sql, usersMapper,data);
+		}
+		}
+	
+	public int count(PageVO pageVO) {
+		if(pageVO.isList()) {
+		String sql = "select count(*) from users";
+		return jdbcTemplate.queryForObject(sql, int.class);
+		}
+		else {
+			String sql = "select count(*) from users where instr(#1, ?) >0";
+			sql.replace("#1", pageVO.getColumn());
+			Object[] data= {pageVO.getKeyword()};
+			return jdbcTemplate.queryForObject(sql,int.class,data);
+		}
 	}
 }

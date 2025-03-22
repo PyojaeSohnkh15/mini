@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.kh.mini.dao.UsersDao;
 import com.kh.mini.dto.UsersDto;
+import com.kh.mini.mapper.AttachmentMapper;
 import com.kh.mini.mapper.UsersMapper;
 
 @Controller
@@ -16,10 +17,13 @@ import com.kh.mini.mapper.UsersMapper;
 public class UsersController {
 
 	@Autowired
-	UsersDao usersDao;
+	private UsersDao usersDao;
 	
 	@Autowired
-	UsersMapper usersMapper;
+	private UsersMapper usersMapper;
+	
+	@Autowired
+	private AttachmentMapper attachmentMapper;
 	
 	@GetMapping("/join")
 	public String join() {

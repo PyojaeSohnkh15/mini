@@ -42,14 +42,20 @@ public class MypageController {
 	
 	//변경
 	@PostMapping("/change")
-	public String change(@ModelAttribute UsersDto usersDto, HttpSession session) {
+	public String change(@ModelAttribute UsersDto usersDto, HttpSession session, @RequestParam String usersPw) {
 		String usersEmail = (String)session.getAttribute("usersEmail");
-		UsersDto findDto = usersDao.selectOne(usersEmail);
+		UsersDto findDto = usersDao.selectOne(usersEmail); //유저정보
+		boolean isValid = usersPw.equals(findDto.getUsersPw()); 
+		if(!isValid) {
+			return "redirect:change?error";
+			}
+		else {
 		findDto.setUsersContact(usersDto.getUsersContact());
 		findDto.setUsersNickname(usersDto.getUsersNickname());
 		usersDao.update(findDto);
 		return "redirect:home";
-	}
+		}
+		}
 	
 	//탈퇴
 	@GetMapping("/exit")
