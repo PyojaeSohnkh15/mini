@@ -1,4 +1,4 @@
- <div class="container-fluid">
+   <div class="container-fluid">
         <div class="row mt-4">
             <div class="col-4 offset-4">
                 <h1 class="text-center">이메일로 가입하기</h1>
@@ -18,10 +18,15 @@
                    <div class="cert-wrapper" style="display: none;">
                        <label class="me-1 form-label" for="certNumber">인증번호 입력</label>
                        <div class="mb-3  input-group">
-                           <input type="text" inputmode="numeric" id="certNumber" class="form-control">
+                            <div class="col-3">
+                                <input type="text" inputmode="numeric" name="certNumber" class="form-control">
+                            </div>
+                            <div class="invalid-feedback">인증번호가 다릅니다</div>
+                            <div class="valid-feedback">인증완료</div>
                            <button type="button" class="btn btn-secondary confirm-cert">
                                <span>인증하기</span>
                             </button>
+                            
                             
                         </div>
                             <button type="submit">다음</button>
